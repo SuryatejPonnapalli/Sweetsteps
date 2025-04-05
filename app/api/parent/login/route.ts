@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import Parent from "@/models/parent.model.ts";
+import Parent from "@/models/parent.models";
 import connectDb from "@/utils/connectDb";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -10,6 +10,7 @@ export const POST = async (request: NextRequest) => {
 
     const req = await request.json();
     const { email, password } = req;
+    console.log(email, password);
 
     const parent = await Parent.findOne({ email });
     if (!parent) {
@@ -28,7 +29,7 @@ export const POST = async (request: NextRequest) => {
       id: parent._id,
       name: parent.name,
       email: parent.email,
-      kidId: parent.kidId,
+      kidId: parent?.kidId,
       timeSpend: parent.timeSpend,
     };
 

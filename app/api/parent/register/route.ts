@@ -1,5 +1,5 @@
 import connectDb from "@/utils/connectDb";
-import Parent from "@/models/parent.model.ts"; // Updated import
+import Parent from "@/models/parent.models"; // Updated import
 import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from "bcryptjs";
 
@@ -17,7 +17,7 @@ export const POST = async (request: NextRequest) => {
         { status: 400 }
       );
     }
-
+    //67f168492751ed4bf2c2ceb2
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(password, salt);
 

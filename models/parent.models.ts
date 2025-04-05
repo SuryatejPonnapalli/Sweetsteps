@@ -8,28 +8,30 @@ export interface IParent extends Document {
   password: string;
 }
 
-const parentSchema: Schema<IParent> = new Schema({
-  name: {
-    type: String,
-    required: true,
+const parentSchema: Schema<IParent> = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    kidId: {
+      type: Schema.Types.ObjectId,
+    },
+    timeSpend: {
+      type: String,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
   },
-  email: {
-    type: String,
-    required: true,
-  },
-  kidId: {
-    type: Schema.Types.ObjectId,
-  },
-  timeSpend: {
-    type: String,
-    enum: ["Morning", "Afternoon", "Night"],
-    required: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-});
+  { timestamps: true }
+);
 
 const Parent =
   mongoose.models.Parent || mongoose.model<IParent>("Parent", parentSchema);

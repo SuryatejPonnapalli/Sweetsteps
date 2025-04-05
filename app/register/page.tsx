@@ -54,7 +54,7 @@ export default function ParentRegisterForm() {
 
       if (res.status === 200) {
         toast("Parent registered successfully");
-        router.push("/parent");
+        router.push("/addKid");
       } else {
         setError(data.error || "Registration failed");
       }

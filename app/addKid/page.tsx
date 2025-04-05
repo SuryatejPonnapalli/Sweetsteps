@@ -64,7 +64,7 @@ export default function KidRegisterForm() {
 
     setFieldErrors({});
     try {
-      const res = await fetch("/api/kid/register", {
+      const res = await fetch("/api/kid/addKid", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -74,7 +74,7 @@ export default function KidRegisterForm() {
 
       if (res.status === 200) {
         toast("Kid registered successfully");
-        router.push("/home");
+        router.push("/login");
       } else {
         setError(data.error || "Something went wrong");
       }

@@ -1,5 +1,5 @@
 import connectDb from "@/utils/connectDb";
-import Parent from "@/models/parent.model.ts"; // Updated import
+import Parent from "@/models/parent.models"; // Updated import
 import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from "bcryptjs";
 

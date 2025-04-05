@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Weekly Task Suggestions</title>
+  </head>
+  <body>
+    <h1>Suggest Tasks for Kids</h1>
+    <form id="taskForm">
+      Goal: <input type="text" name="goal" /><br />
+      Characteristics: <input type="text" name="characteristics" /><br />
+      Age: <input type="number" name="age" /><br />
+      Interests (comma-separated): <input type="text" name="interests" /><br />
+      Available Time: <input type="text" name="available_time" /><br />
+      <button type="submit">Get Tasks</button>
+    </form>
+
+    <h2>Suggested Tasks</h2>
+    <div id="weeklyTasks"></div>
+
+    <script>
+      const form = document.getElementById("taskForm");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const data = {
+          goal: formData.get("goal"),
+          characteristics: formData.get("characteristics"),
+          age: parseInt(formData.get("age")),
+          interests: formData
+            .get("interests")
+            .split(",")
+            .map((i) => i.trim()),
+          available_time: formData.get("available_time"),
+          selected_week: 1, // still required by the backend model
+        };
+
+        try {
+          const res = await fetch("/suggest_tasks", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+
+          const result = await res.json();
+          const container = document.getElementById("weeklyTasks");
+          container.innerHTML = "";
+
+          for (const week in result) {
+            const h3 = document.createElement("h3");
+            h3.textContent = week;
+            container.appendChild(h3);
+
+            const ul = document.createElement("ul");
+            result[week].forEach((task) => {
+              const li = document.createElement("li");
+              li.textContent = `${task[0]} (Difficulty: ${task[1]})`;
+              ul.appendChild(li);
+            });
+
+            container.appendChild(ul);
+          }
+        } catch (err) {
+          console.error("Error:", err);
+        }
+      });
+    </script>
+  </body>
+</html>

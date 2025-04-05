@@ -85,20 +85,35 @@ export default function KidRegisterForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020817] flex items-center justify-center px-4">
-      <div className="w-full max-w-lg p-8 rounded-lg border border-gray-800 bg-[#020817]/50 backdrop-blur-sm">
-        <h1 className="text-2xl font-semibold text-white mb-4">Register Kid</h1>
+    <div className="min-h-screen bg-[#FFEED0] flex flex-col items-center justify-center px-4">
+      <div className="flex flex-col items-center justify-center px-8 py-6">
+        <div>
+          <img src="/legsF.png" alt="Steps Image" className="w-28 h-28" />
+        </div>
+
+        <div>
+          <p className="text-[#FF6B81] font-bold text-5xl font-baloo">
+            SweetSteps
+          </p>
+        </div>
+      </div>
+
+      <div className="w-full max-w-lg p-8 rounded-lg border px-8 bg-[#FFF8EB] backdrop-blur-sm">
+        <h1 className="text-2xl font-semibold text-[#FF6B81] mb-4">
+          Register Kid
+        </h1>
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="text-gray-400 text-sm">Name</label>
+            <label className="text-[#777777] text-sm">Name</label>
             <Input
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
               placeholder="Enter kid's name"
+              className="bg-[#F6F1E8] text-[#777777] placeholder:text-gray-500"
             />
             {fieldErrors.name && (
               <p className="text-red-500 text-sm">{fieldErrors.name}</p>
@@ -106,13 +121,14 @@ export default function KidRegisterForm() {
           </div>
 
           <div>
-            <label className="text-gray-400 text-sm">Date of Birth</label>
+            <label className="text-[#777777] text-sm">Date of Birth</label>
             <Input
               type="date"
               value={formData.dob}
               onChange={(e) =>
                 setFormData({ ...formData, dob: e.target.value })
               }
+              className="bg-[#F6F1E8] text-[#777777] placeholder:text-gray-500"
             />
             {fieldErrors.dob && (
               <p className="text-red-500 text-sm">{fieldErrors.dob}</p>
@@ -120,7 +136,7 @@ export default function KidRegisterForm() {
           </div>
 
           <div>
-            <label className="text-gray-400 text-sm">Personality</label>
+            <label className="text-[#F6F1E8 ] text-sm">Personality</label>
             <div className="flex flex-wrap gap-2 mt-2">
               {[
                 "shy",
@@ -130,7 +146,7 @@ export default function KidRegisterForm() {
                 "atheletic",
                 "playful",
               ].map((trait) => (
-                <label key={trait} className="text-white text-sm">
+                <label key={trait} className="text-[#777777] text-sm">
                   <input
                     type="checkbox"
                     checked={formData.personality.includes(trait)}
@@ -147,13 +163,14 @@ export default function KidRegisterForm() {
           </div>
 
           <div>
-            <label className="text-gray-400 text-sm">Parent Expectation</label>
+            <label className="text-[#777777] text-sm">Parent Expectation</label>
             <Input
               value={formData.expectation}
               onChange={(e) =>
                 setFormData({ ...formData, expectation: e.target.value })
               }
               placeholder="e.g., Improve confidence"
+              className="bg-[#F6F1E8] text-[#777777] placeholder:text-gray-500"
             />
             {fieldErrors.expectation && (
               <p className="text-red-500 text-sm">{fieldErrors.expectation}</p>
@@ -161,10 +178,10 @@ export default function KidRegisterForm() {
           </div>
 
           <div>
-            <label className="text-gray-400 text-sm">Interests</label>
+            <label className="text-[#777777] text-sm">Interests</label>
             <div className="flex flex-wrap gap-2 mt-2">
               {["drawing", "sports", "singing", "dance"].map((item) => (
-                <label key={item} className="text-white text-sm">
+                <label key={item} className="text-[#777777] text-sm">
                   <input
                     type="checkbox"
                     checked={formData.interests.includes(item)}
@@ -180,7 +197,7 @@ export default function KidRegisterForm() {
             )}
           </div>
 
-          <Button type="submit" className="w-full mt-4">
+          <Button type="submit" className="w-full mt-4 bg-[#FF6B81] text-white">
             Register Kid
           </Button>
         </form>

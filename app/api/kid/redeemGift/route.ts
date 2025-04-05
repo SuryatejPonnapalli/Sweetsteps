@@ -10,14 +10,17 @@ export const POST = async (request: NextRequest) => {
 
   try {
     const parent = await getTokenData(request);
+    await connectDb();
+
+    console.log(giftSugarLevel);
 
     const updatedKid = await Kid.findOneAndUpdate(
       {
         _id: parent.kidId,
-        sugarLevel: { $gte: giftSugarLevel },
+        sugarCollected: { $gte: giftSugarLevel },
       },
       {
-        $inc: { sugarLevel: -giftSugarLevel },
+        $inc: { sugarCollected: -giftSugarLevel },
       },
       { new: true }
     );

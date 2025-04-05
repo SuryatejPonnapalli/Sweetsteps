@@ -1,4 +1,5 @@
 import Kid from "@/models/kid.models";
+import Parent from "@/models/parent.models";
 import connectDb from "@/utils/connectDb";
 import { getTokenData } from "@/utils/getJwtData";
 import { NextResponse, NextRequest } from "next/server";
@@ -17,7 +18,9 @@ export const POST = async (request: NextRequest) => {
 
   try {
     const parent = await getTokenData(request);
+    await connectDb();
     const parentId = parent?.id;
+
     const kid = await Kid.create({
       parentId: parentId,
       name: name,
@@ -27,7 +30,13 @@ export const POST = async (request: NextRequest) => {
       interests: interests,
     });
 
-    if (!kid) {
+    const updateParent = await Parent.findByIdAndUpdate(
+      parent.id,
+      { kidId: kid._id },
+      { new: true }
+    );
+
+    if (!kid || !updateParent) {
       return NextResponse.json(
         { success: false, message: "Kid could not be created." },
         { status: 500 }

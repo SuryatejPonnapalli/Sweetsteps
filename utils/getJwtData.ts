@@ -6,13 +6,14 @@ interface TokenDecoded extends JwtPayload {
   id: string;
   name: string;
   email: string;
-  kidId: mongoose.Types.ObjectId;
+  kidId?: mongoose.Types.ObjectId;
   timeSpend: number;
 }
 
 export const getTokenData = async (request: NextRequest) => {
   try {
     const token = request.cookies.get("token")?.value || "";
+
     const decodedToken = jwt.verify(
       token,
       process.env.TOKEN_SECRET!
@@ -24,16 +25,15 @@ export const getTokenData = async (request: NextRequest) => {
       "id" in decodedToken &&
       "name" in decodedToken &&
       "email" in decodedToken &&
-      "kidId" in decodedToken &&
       "timeSpend" in decodedToken
     ) {
       const tokenData = decodedToken as TokenDecoded;
-      console.log(tokenData);
+
       return {
         id: tokenData.id,
         name: tokenData.name,
         email: tokenData.email,
-        kidId: tokenData.kidId,
+        kidId: tokenData.kidId || null,
         timeSpend: tokenData.timeSpend,
       };
     }

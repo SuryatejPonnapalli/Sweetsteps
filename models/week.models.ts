@@ -5,12 +5,14 @@ export interface IWeek extends Document {
   weekNo: number;
   kidId: mongoose.Types.ObjectId;
   sugarCollected: number;
+  weekStart: Date;
 }
 
 const weekSchema: Schema<IWeek> = new Schema(
   {
     parentId: {
       type: Schema.Types.ObjectId,
+      ref: "Parent",
       required: true,
     },
     weekNo: {
@@ -19,7 +21,16 @@ const weekSchema: Schema<IWeek> = new Schema(
     },
     kidId: {
       type: Schema.Types.ObjectId,
+      ref: "Kid",
       required: true,
+    },
+    weekStart: {
+      type: Date,
+      required: true,
+    },
+    sugarCollected: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }

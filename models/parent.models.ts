@@ -20,6 +20,7 @@ const parentSchema: Schema<IParent> = new Schema(
     },
     kidId: {
       type: Schema.Types.ObjectId,
+      ref: "Kid",
     },
     timeSpend: {
       type: String,

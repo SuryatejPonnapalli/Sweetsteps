@@ -8,20 +8,23 @@ export const POST = async (request: NextRequest) => {
 
   try {
     await connectDb();
-    const newTasks = await Promise.all(
-      tasks.map(async (task: any, index: number) => {
-        await Task.create({
-          weekId: task.weekId,
-          task: task.task,
-          difficulty: task.difficulty,
-          status: "Incomplete",
-        });
-      })
-    );
+
+    const formattedTasks = tasks.map((task: any) => ({
+      weekId: task.weekId,
+      task: task.task,
+      difficulty: task.difficulty,
+      status: "Incomplete",
+      endDay: task.endDay,
+    }));
+
+    const newTasks = await Task.insertMany(formattedTasks);
 
     //other alternative const newTasks = await Task.insertMany(task)
 
-    return NextResponse.json({ success: true, newTasks }, { status: 200 });
+    return NextResponse.json(
+      { success: true, newTasks: newTasks },
+      { status: 200 }
+    );
   } catch (error) {
     return NextResponse.json({ success: false, error: error }, { status: 500 });
   }

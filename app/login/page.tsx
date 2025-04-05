@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { TailSpin } from "react-loader-spinner";
+import Image from "next/image";
 
 const loginSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -65,26 +66,27 @@ export default function ParentLoginForm() {
     }
   };
 
+
   return (
-    <div className="min-h-screen bg-[#020817] flex items-center justify-center px-4">
-      <div className="w-full max-w-md p-8 rounded-lg border border-gray-800 bg-[#020817]/50 backdrop-blur-sm">
-        <h1 className="text-2xl font-semibold text-white mb-2">Parent Login</h1>
-        <p className="text-gray-400 mb-6">
-          Enter your email and password to log in
-        </p>
-
+    <div className="flex flex-col items-center px-4 bg-[#FFEED0] min-h-screen">
+      <div className="flex flex-col items-center justify-center mt-10 mb-4">
+        <Image src="/legsF.png" height={100} width={100} alt="Legs illustration" />
+        <p className="text-[#ff6b81] font-bold text-4xl m-4">SweetSteps</p>
+      </div>
+      <div className="w-full max-w-md p-8 rounded-lg border border-white bg-white">
+        <h1 className="text-2xl text-[#ff6b81] mb-2 font-bold">Parent Login</h1>
         {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
-
+      <div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <label htmlFor="email" className="text-sm text-gray-400">
-              Email
+            <label htmlFor="email" className="text-lg font-semibold text-gray-400">
+              Username
             </label>
             <Input
               id="email"
               type="email"
-              placeholder="Enter your email"
-              className="bg-gray-900/50 border-gray-800 text-white placeholder:text-gray-500"
+              placeholder="Enter username"
+              className="bg-gray-100 placeholder:text-gray-500"
               value={formData.email}
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
@@ -97,14 +99,14 @@ export default function ParentLoginForm() {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="password" className="text-sm text-gray-400">
+            <label htmlFor="password" className="text-lg text-gray-400 font-semibold">
               Password
             </label>
             <Input
               id="password"
               type="password"
-              placeholder="Enter your password"
-              className="bg-gray-900/50 border-gray-800 text-white placeholder:text-gray-500"
+              placeholder="Enter passowrd"
+              className="bg-gray-100 placeholder:text-gray-500"
               value={formData.password}
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
@@ -116,16 +118,20 @@ export default function ParentLoginForm() {
             )}
           </div>
 
-          <div className="flex items-center justify-center mt-[30px] mr-6">
-            <Button type="submit" size="lg" className="text-md w-[75%]">
+          <div className="flex items-center justify-center mt-12 mr-6">
+            <Button type="submit" size="lg" className="text-md w-[75%] bg-[#ff6b81] text-lg font-bold">
               {loginClick ? (
-                <TailSpin height="20" width="20" color="#FFFFFF" />
+                <TailSpin height="20" width="20" color="#ff6b81" />
               ) : (
                 "Login"
               )}
             </Button>
           </div>
         </form>
+        </div>  
+      </div>
+      <div className="mt-auto mb-12">
+        <button className="bg-white py-2 px-20 text-lg rounded-md" onClick={()=>{router.push("/register")}}>Sign Up</button>
       </div>
     </div>
   );

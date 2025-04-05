@@ -10,7 +10,7 @@ import { TailSpin } from "react-loader-spinner";
 
 const loginSchema = z.object({
   email: z.string().email("Enter a valid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(4, "Password must be at least 6 characters"),
 });
 
 export default function ParentLoginForm() {

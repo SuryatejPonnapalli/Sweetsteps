@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from "mongoose";
 export interface IKid extends Document {
   name: string;
   dob: string;
-  personality: string;
+  personality: string[];
   expectation: string;
   interests: string[];
   sugarCollected: number;
@@ -20,8 +20,16 @@ const kidSchema: Schema<IKid> = new Schema(
       required: true,
     },
     personality: {
-      type: String,
+      type: [String],
       required: true,
+      enum: [
+        "shy",
+        "creative",
+        "energetic",
+        "sensitive",
+        "atheletic",
+        "playful",
+      ],
     },
     expectation: {
       type: String,
@@ -30,7 +38,7 @@ const kidSchema: Schema<IKid> = new Schema(
     interests: {
       type: [String],
       required: true,
-      enum: ["drawing", "sports", "music", "dance"],
+      enum: ["drawing", "sports", "singing", "dance"],
     },
     sugarCollected: {
       type: Number,

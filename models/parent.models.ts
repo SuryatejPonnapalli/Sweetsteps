@@ -4,7 +4,7 @@ export interface IParent extends Document {
   name: string;
   email: string;
   kidId: mongoose.Types.ObjectId;
-  timeSpend: "Morning" | "Afternoon" | "Night";
+  timeSpend: "morning" | "afternoon" | "evening" | "night";
   password: string;
 }
 
@@ -25,6 +25,7 @@ const parentSchema: Schema<IParent> = new Schema(
     timeSpend: {
       type: String,
       required: true,
+      enum: ["morning", "evening", "afternoon", "night"],
     },
     password: {
       type: String,

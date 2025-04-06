@@ -1,26 +1,26 @@
 import Kid from "@/models/kid.models";
 import calculateAge from "@/utils/calculateDob";
+import connectDb from "@/utils/connectDb";
 import { getTokenData } from "@/utils/getJwtData";
 import { NextResponse, NextRequest } from "next/server";
 
 export const POST = async (request: NextRequest) => {
   try {
     const parent = await getTokenData(request);
+    await connectDb();
     const kid = await Kid.findById(parent.kidId);
 
-    console.log(kid.dob);
-
     const age = calculateAge(kid.dob);
-
-    console.log(age);
 
     const payload = {
       goal: kid.expectation,
       characteristics: kid.personality,
       age: age,
       interests: kid.interests,
-      available_time: kid.timeSpend,
+      available_time: parent.timeSpend,
     };
+
+    console.log(payload);
 
     const response = await fetch(`${process.env.ML_URL}/suggest_tasks`, {
       method: "POST",
@@ -39,7 +39,8 @@ export const POST = async (request: NextRequest) => {
     }
 
     const data = await response.json();
-    return NextResponse.json({ success: true, data });
+    console.log(data);
+    return NextResponse.json({ success: true, data: "hello" });
   } catch (error) {
     return NextResponse.json({
       success: false,

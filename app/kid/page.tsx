@@ -264,7 +264,7 @@ export default function Dashboard() {
                 />
               </div>
             </div>
-            {imageSelected && <button onClick={handleToyClick}></button>}
+            {imageSelected && <button onClick={handleToyClick}>Buy toy</button>}
           </div>
         )}
 

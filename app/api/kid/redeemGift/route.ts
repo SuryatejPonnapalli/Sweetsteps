@@ -8,6 +8,8 @@ export const POST = async (request: NextRequest) => {
   const req = await request.json();
   const { giftSugarLevel, giftType } = req;
 
+  console.log(req);
+
   try {
     const parent = await getTokenData(request);
     await connectDb();

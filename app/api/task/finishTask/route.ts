@@ -1,6 +1,5 @@
 import Kid from "@/models/kid.models";
 import Task from "@/models/task.models";
-import Week from "@/models/week.models";
 import connectDb from "@/utils/connectDb";
 import { NextResponse, NextRequest } from "next/server";
 
@@ -34,25 +33,28 @@ export const POST = async (request: NextRequest) => {
     if (updatedTask.difficulty === "e") {
       updateKidSugar = await Kid.findByIdAndUpdate(
         updatedTask?.weekId?.kidId?._id,
-        { $inc: { sugarLevel: 5 } },
+        { $inc: { sugarCollected: 5 } },
         { new: true }
       );
     }
     if (updatedTask.difficulty === "m") {
       updateKidSugar = await Kid.findByIdAndUpdate(
         updatedTask?.weekId?.kidId?._id,
-        { $inc: { sugarLevel: 7 } },
+        { $inc: { sugarCollected: 7 } },
         { new: true }
       );
     }
     if (updatedTask.difficulty === "h") {
+      console.log("here");
       updateKidSugar = await Kid.findByIdAndUpdate(
         updatedTask?.weekId?.kidId?._id,
-        { $inc: { sugarLevel: 10 } },
+        { $inc: { sugarCollected: 10 } },
         { new: true }
       );
     }
 
+    console.log("task", updatedTask);
+    console.log("sugar", updateKidSugar);
     if (!updatedTask || !updateKidSugar) {
       return NextResponse.json(
         { success: false, message: "Failed in updating Database." },
@@ -74,7 +76,7 @@ export const POST = async (request: NextRequest) => {
         success: false,
         message: "Task failed",
       },
-      { status: error?.status || 500 } //check error status
+      { status: 500 } //check error status
     );
   }
 };

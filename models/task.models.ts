@@ -5,12 +5,14 @@ export interface ITask extends Document {
   task: string;
   difficulty: string;
   status: string;
+  endDay: Date;
 }
 
 const taskSchema: Schema<ITask> = new Schema(
   {
     weekId: {
       type: Schema.Types.ObjectId,
+      ref: "Week",
       required: true,
     },
     task: {
@@ -20,11 +22,16 @@ const taskSchema: Schema<ITask> = new Schema(
     difficulty: {
       type: String,
       enum: ["e", "m", "h"],
+      default: "e",
       required: true,
     },
     status: {
       type: String,
       enum: ["Complete", "Incomplete"],
+    },
+    endDay: {
+      type: Date,
+      required: true,
     },
   },
   { timestamps: true }

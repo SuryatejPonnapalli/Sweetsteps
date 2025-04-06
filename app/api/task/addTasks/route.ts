@@ -4,21 +4,21 @@ import { NextResponse, NextRequest } from "next/server";
 
 export const POST = async (request: NextRequest) => {
   const req = await request.json();
-  console.log(req);
-  const { tasks } = req;
-  console.log(tasks);
+  const { tasks, weekId } = req;
 
   console.log(tasks);
   try {
     await connectDb();
 
     const formattedTasks = tasks.map((task: any) => ({
-      weekId: task.weekId,
+      weekId: weekId,
       task: task.task,
       difficulty: task.difficulty,
       status: "Incomplete",
       endDay: task.endDay,
     }));
+
+    console.log(formattedTasks);
 
     const newTasks = await Task.insertMany(formattedTasks);
 

@@ -105,7 +105,6 @@ This project was built for **[Enigma 418 Hackathon]**, under the theme **“SUGA
 ## 🤝 Team
 
 - **Dhanush Pavan Surya Harshith Punith Dinesh**  
-- *(Add other teammates if any)*
 
 ---
 

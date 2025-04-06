@@ -215,6 +215,7 @@ export default function Dashboard() {
                   )}
                   onClick={() => {
                     setImageValue(0);
+                    setImageSelected(true);
                   }}
                 />
                 <Image
@@ -228,6 +229,7 @@ export default function Dashboard() {
                   )}
                   onClick={() => {
                     setImageValue(1);
+                    setImageSelected(true);
                   }}
                 />
               </div>
@@ -243,6 +245,7 @@ export default function Dashboard() {
                   )}
                   onClick={() => {
                     setImageValue(2);
+                    setImageSelected(true);
                   }}
                 />
                 <Image
@@ -256,6 +259,7 @@ export default function Dashboard() {
                   )}
                   onClick={() => {
                     setImageValue(3);
+                    setImageSelected(true);
                   }}
                 />
               </div>

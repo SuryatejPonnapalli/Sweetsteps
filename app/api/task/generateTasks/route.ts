@@ -5,7 +5,9 @@ import { getTokenData } from "@/utils/getJwtData";
 import { NextResponse, NextRequest } from "next/server";
 
 export const POST = async (request: NextRequest) => {
+  console.log("sajkndasd");
   try {
+    console.log("sajkndasd");
     const parent = await getTokenData(request);
     await connectDb();
     const kid = await Kid.findById(parent.kidId);
@@ -29,7 +31,7 @@ export const POST = async (request: NextRequest) => {
       },
       body: JSON.stringify(payload),
     });
-
+    console.log(response);
     if (!response.ok) {
       return NextResponse.json({
         success: false,
@@ -39,8 +41,8 @@ export const POST = async (request: NextRequest) => {
     }
 
     const data = await response.json();
-    console.log(data);
-    return NextResponse.json({ success: true, data: "hello" });
+    console.log("aheheheh", data);
+    return NextResponse.json({ success: true, data: data });
   } catch (error) {
     return NextResponse.json({
       success: false,

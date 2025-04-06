@@ -43,7 +43,6 @@ export default function Dashboard() {
       const res = await fetch("/api/week/getWeek", { method: "POST" });
 
       const data = await res.json();
-      console.log(data);
       if (data.success) {
         setWeek(data.data.week);
         setTasks(data.data.tasks || []);
@@ -72,7 +71,6 @@ export default function Dashboard() {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchDashboardData();
   }, []);
@@ -82,13 +80,7 @@ export default function Dashboard() {
       <header className="flex justify-between items-center p-4">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full overflow-hidden bg-[#]">
-            <Image
-              src="/placeholder.svg?height=48&width=48"
-              alt="Profile"
-              width={48}
-              height={48}
-              className="object-cover"
-            />
+            <div className="w-12 h-12 rounded-full overflow-hidden bg-pink-500"></div>
           </div>
         </div>
         <h1 className="text-2xl font-bold">Dashboard</h1>
@@ -154,14 +146,45 @@ export default function Dashboard() {
                   <div className="h-6 w-6 bg-white rounded-2xl"></div>
                   <h1 className="text-[#6D6D6D] text-lg">{task.task}</h1>
                 </div>
-                <p className="text-[8px]">{task.endDay}</p>
+                <p className="text-[7.4px]">
+                  {new Date(task.endDay).toDateString() ===
+                  new Date().toDateString()
+                    ? "Today"
+                    : new Date(task.endDay).toLocaleDateString("en-US", {
+                        weekday: "long",
+                      })}
+                </p>
               </div>
               {task.status === "Complete" ? (
                 <span className="bg-[#00885F] text-white rounded-2xl h-6 w-6 ml-auto flex items-center justify-center">
                   <Check size={16} />
                 </span>
               ) : (
-                <button className="bg-[#00885F] rounded-md w-[60%] justify-center mx-auto text-white">
+                <button
+                  className="bg-[#00885F] rounded-md w-[60%] justify-center mx-auto text-white"
+                  onClick={async () => {
+                    try {
+                      const res = await fetch("/api/task/finishTask", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ taskId: task._id }),
+                      });
+
+                      const data = await res.json();
+                      if (data.success) {
+                        alert("Task marked as complete!");
+                        location.reload(); // or update state if you want to avoid reload
+                      } else {
+                        alert("Failed to mark task as complete.");
+                      }
+                    } catch (err) {
+                      console.error("Error completing task", err);
+                      alert(
+                        "Something went wrong while marking the task as complete."
+                      );
+                    }
+                  }}
+                >
                   Done
                 </button>
               )}
@@ -185,13 +208,13 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full overflow-hidden bg-pink-500">
-                <Image
+                {/* <Image
                   src="/placeholder.svg?height=48&width=48"
                   alt="Kid Profile"
                   width={48}
                   height={48}
                   className="object-cover"
-                />
+                /> */}
               </div>
               <div>
                 <h3 className="text-lg font-medium text-green-700">
@@ -206,8 +229,11 @@ export default function Dashboard() {
         </Card>
       </section>
 
-      {showAddTaskModal && (
-        <ShowAddTaskModal closeModal={() => setShowAddModal(false)} />
+      {showAddTaskModal && week && (
+        <ShowAddTaskModal
+          closeModal={() => setShowAddModal(false)}
+          weekId={week._id}
+        />
       )}
     </div>
   );
@@ -215,10 +241,12 @@ export default function Dashboard() {
 
 interface ShowAddTaskModalProps {
   closeModal: () => void;
+  weekId: string;
 }
 
-const ShowAddTaskModal = ({ closeModal }: { closeModal: () => void }) => {
+const ShowAddTaskModal = ({ closeModal, weekId }: ShowAddTaskModalProps) => {
   const [expandedDay, setExpandedDay] = useState<string | null>(null);
+  const [suggestedTasks, setSuggestedTasks] = useState<string[]>([]);
   const [tasks, setTasks] = useState<Record<string, string>>({
     Monday: "",
     Tuesday: "",
@@ -228,6 +256,28 @@ const ShowAddTaskModal = ({ closeModal }: { closeModal: () => void }) => {
     Saturday: "",
   });
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      try {
+        const res = await fetch("/api/task/generateTasks", { method: "POST" });
+        const data = await res.json();
+        console.log(data);
+        if (data.success && data.data?.week_1) {
+          const suggestions = data.data.week_1.map(
+            (item: [string, string]) => item[0]
+          );
+          setSuggestedTasks(suggestions);
+        }
+      } catch (err) {
+        console.error("Failed to fetch suggestions", err);
+      }
+    };
+
+    fetchSuggestions();
+  }, []);
+
+  console.log(suggestedTasks);
 
   const days = [
     { name: "Monday", color: "bg-[#f8c4c4]" },
@@ -249,35 +299,47 @@ const ShowAddTaskModal = ({ closeModal }: { closeModal: () => void }) => {
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      // Get latest week info (to get weekId)
-      const res = await fetch("/api/week/getWeek", { method: "POST" });
-      const data = await res.json();
-
-      const weekId = data.data.week._id;
-      console.log("weeki", weekId);
+      const today = new Date();
 
       const tasksToSend = Object.entries(tasks)
         .filter(([_, value]) => value.trim() !== "")
-        .map(([day, value]) => ({
-          weekId,
-          task: value,
-          difficulty: "Easy", // default or use custom input
-          status: "Incomplete",
-          endDay: day,
-        }));
+        .map(([day, value]) => {
+          const endDate = new Date();
+          const dayIndex = [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ].indexOf(day);
 
-      const createRes = await fetch("/api/task/create", {
+          const diff = (dayIndex + 7 - endDate.getDay()) % 7;
+          endDate.setDate(endDate.getDate() + diff);
+          endDate.setHours(23, 59, 59, 999);
+
+          return {
+            weekId: weekId,
+            task: value.trim(),
+            difficulty: "e",
+            status: "Incomplete",
+            endDay: endDate.toISOString(),
+          };
+        });
+
+      const createRes = await fetch("/api/task/addTasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tasks: tasksToSend }),
+        body: JSON.stringify({ tasks: tasksToSend, weekId }),
       });
 
       const result = await createRes.json();
 
       if (result.success) {
         alert("Tasks created successfully!");
-        closeModal(); // Close modal
-        location.reload(); // Optionally reload to fetch updated task list
+        closeModal();
+        location.reload();
       } else {
         alert("Something went wrong while creating tasks.");
       }
@@ -313,7 +375,7 @@ const ShowAddTaskModal = ({ closeModal }: { closeModal: () => void }) => {
               </button>
 
               {expandedDay === day.name && (
-                <div className="p-4 bg-white/50 border border-t-0 border-gray-200">
+                <div className="p-4 bg-white/50 border border-t-0 border-gray-200 space-y-2">
                   <textarea
                     value={tasks[day.name]}
                     onChange={(e) => handleTaskChange(day.name, e.target.value)}
@@ -321,6 +383,48 @@ const ShowAddTaskModal = ({ closeModal }: { closeModal: () => void }) => {
                     placeholder={`Enter a task for ${day.name}`}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2a5d3c] resize-none"
                   />
+                  {/* {suggestedTasks.length > 0 && (
+                    <div className="text-left space-y-1">
+                      <p className="text-sm font-semibold text-gray-600">
+                        Suggestions:
+                      </p>
+                      <ul className="space-y-1">
+                        {suggestedTasks.map((suggestion, index) => (
+                          <li
+                            key={index}
+                            className="bg-white border text-sm px-3 py-2 rounded-lg cursor-pointer hover:bg-[#f8ebd0]"
+                            onClick={() =>
+                              handleTaskChange(day.name, suggestion)
+                            }
+                          >
+                            {suggestion}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )} */}
+                  {suggestedTasks.length > 0 && (
+                    <div className="text-left space-y-1">
+                      <p className="text-sm font-semibold text-gray-600">
+                        Suggestions:
+                      </p>
+                      <div className="max-h-40 overflow-y-auto pr-1">
+                        <ul className="space-y-1">
+                          {suggestedTasks.map((suggestion, index) => (
+                            <li
+                              key={index}
+                              className="bg-white border text-sm px-3 py-2 rounded-lg cursor-pointer hover:bg-[#f8ebd0]"
+                              onClick={() =>
+                                handleTaskChange(day.name, suggestion)
+                              }
+                            >
+                              {suggestion}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

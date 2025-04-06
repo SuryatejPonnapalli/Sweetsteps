@@ -1,5 +1,6 @@
 export default function calculateAge(dobString: string): number {
-  const [day, month, year] = dobString.split("-").map(Number);
+  console.log(dobString);
+  const [year, month, day] = dobString.split("-").map(Number);
   const dob = new Date(year, month - 1, day); // JS months are 0-based
   const today = new Date();
 

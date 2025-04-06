@@ -4,8 +4,11 @@ import { NextResponse, NextRequest } from "next/server";
 
 export const POST = async (request: NextRequest) => {
   const req = await request.json();
+  console.log(req);
   const { tasks } = req;
+  console.log(tasks);
 
+  console.log(tasks);
   try {
     await connectDb();
 
@@ -18,8 +21,6 @@ export const POST = async (request: NextRequest) => {
     }));
 
     const newTasks = await Task.insertMany(formattedTasks);
-
-    //other alternative const newTasks = await Task.insertMany(task)
 
     return NextResponse.json(
       { success: true, newTasks: newTasks },

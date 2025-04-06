@@ -22,6 +22,7 @@ const taskSchema: Schema<ITask> = new Schema(
     difficulty: {
       type: String,
       enum: ["e", "m", "h"],
+      default: "e",
       required: true,
     },
     status: {

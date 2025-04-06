@@ -1,82 +1,81 @@
 "use client";
+
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plus, Menu } from "lucide-react";
-import { Check } from "lucide-react";
+import { Plus, Menu, Check, X, ChevronDown } from "lucide-react";
 import sugarCube from "@/public/sugarcube.jpeg";
-import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+
+interface Task {
+  _id: string;
+  task: string;
+  difficulty: string;
+  status: "Complete" | "Incomplete";
+  endDay: string;
+}
+
+interface Week {
+  _id: string;
+  weekNo: number;
+  weekStart: string;
+  sugarCollected: number;
+}
 
 export default function Dashboard() {
   const today = new Date();
-  const [showAddTaskModal, setShowAddModal] = useState<boolean>(false);
   const formattedDate = today.toLocaleDateString("en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
 
-  const tasks = [
-    {
-      day: "Monday",
-      task: "Cleaning",
-      description: "Clean your bedroom and change your blanket",
-      status: "done",
-      color: "bg-pink-200",
-    },
-    {
-      day: "Tuesday",
-      task: "Reading",
-      description: "Read a storybook for 15 minutes",
-      status: "done",
-      color: "bg-green-200",
-    },
-    {
-      day: "Wednesday",
-      task: "Cleaning",
-      description: "Clean your bedroom and change your blanket",
-      status: "not-done",
-      color: "bg-red-200",
-    },
-    {
-      day: "Thursday",
-      task: "Cleaning",
-      description: "Clean your bedroom and change your blanket",
-      status: "done",
-      color: "bg-yellow-200",
-    },
-    {
-      day: "Friday",
-      task: "Cleaning",
-      description: "Clean your bedroom and change your blanket",
-      status: "done",
-      color: "bg-blue-200",
-    },
-    {
-      day: "Saturday",
-      task: "Cleaning",
-      description: "Clean your bedroom and change your blanket",
-      status: "done",
-      color: "bg-purple-200",
-    },
-  ];
+  const [showAddTaskModal, setShowAddModal] = useState<boolean>(false);
+  const [week, setWeek] = useState<Week | null>(null);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [message, setMessage] = useState("");
+  const [kid, setKid] = useState<{ name: string; age: number } | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const achievements = [
-    {
-      name: "Sugar Points",
-      value: "3500+",
-      icon: sugarCube,
-      color: "bg-yellow-200",
-    },
-    {
-      name: "Big Candy",
-      value: "10+",
-      icon: sugarCube,
-      color: "bg-yellow-200",
-    },
-    { name: "Toys", value: "8+", icon: sugarCube, color: "bg-yellow-200" },
-  ];
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/week/getWeek", { method: "POST" });
+
+      const data = await res.json();
+      console.log(data);
+      if (data.success) {
+        setWeek(data.data.week);
+        setTasks(data.data.tasks || []);
+        const dob = new Date(data.data.kid.dob);
+        const today = new Date();
+        const age =
+          today.getFullYear() -
+          dob.getFullYear() -
+          (today.getMonth() < dob.getMonth() ||
+          (today.getMonth() === dob.getMonth() &&
+            today.getDate() < dob.getDate())
+            ? 1
+            : 0);
+
+        setKid({
+          name: data.data.kid.name,
+          age: age,
+        });
+      } else {
+        setMessage(data.message || "Something went wrong");
+      }
+    } catch (err) {
+      console.error("Failed to fetch data", err);
+      setMessage("Failed to fetch week");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
   return (
     <div className="bg-[#FFEED0] min-h-screen pb-8">
@@ -129,11 +128,20 @@ export default function Dashboard() {
             variant="ghost"
             size="icon"
             className="rounded-full bg-[#FF6B81] text-white hover:bg-pink-600"
-            onClick={() => setShowAddModal((prev) => !prev)}
+            onClick={() => setShowAddModal(true)}
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-5 w-5 text-white" />
           </Button>
         </div>
+
+        {tasks.length === 0 && (
+          <div className="h-[8rem] w-full border-2 border-dotted border-[#003a29] flex flex-col items-center justify-center rounded-2xl">
+            <Plus className="h-10 w-10 bg-[#ff6b81] rounded-3xl" />
+            <p className="w-[8rem] items-center">
+              No tasks added till now add tasks
+            </p>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-4">
           {tasks.map((task, index) => (
@@ -146,36 +154,17 @@ export default function Dashboard() {
                   <div className="h-6 w-6 bg-white rounded-2xl"></div>
                   <h1 className="text-[#6D6D6D] text-lg">{task.task}</h1>
                 </div>
-
-                <p className="text-[8px]">{task.day}</p>
+                <p className="text-[8px]">{task.endDay}</p>
               </div>
-              <p className="text-xs">{task.description}</p>
-              {/* <button className="bg-[#00885F] rounded-md w-[60%] justify-center mx-auto text-white">
-                Done
-              </button> */}
-              <span className="bg-[#00885F] text-white rounded-2xl h-6 w-6 ml-auto flex items-center justify-center">
-                <Check size={16} />
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
-      <section className="p-4">
-        <h2 className="text-xl font-bold mb-4">Kid's Achievements</h2>
-        <div className="flex justify-between">
-          {achievements.map((achievement, index) => (
-            <div key={index} className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full overflow-hidden bg-[#FFE57C] mb-2 items-center justify-center">
-                <Image
-                  src={achievement.icon}
-                  alt={achievement.name}
-                  width={40}
-                  height={40}
-                  className=" object-cover  mix-blend-multiply items-center justify-center mx-auto mt-2"
-                />
-              </div>
-              <h3 className="text-sm font-medium">{achievement.name}</h3>
-              <p className="text-yellow-500 font-bold">{achievement.value}</p>
+              {task.status === "Complete" ? (
+                <span className="bg-[#00885F] text-white rounded-2xl h-6 w-6 ml-auto flex items-center justify-center">
+                  <Check size={16} />
+                </span>
+              ) : (
+                <button className="bg-[#00885F] rounded-md w-[60%] justify-center mx-auto text-white">
+                  Done
+                </button>
+              )}
             </div>
           ))}
         </div>
@@ -206,41 +195,39 @@ export default function Dashboard() {
               </div>
               <div>
                 <h3 className="text-lg font-medium text-green-700">
-                  Ansh Kumar
+                  {kid?.name ?? "Loading..."}
                 </h3>
-                <p className="text-sm text-gray-600">6 years</p>
+                <p className="text-sm text-gray-600">
+                  {kid ? `${kid.age} years` : "Fetching age..."}
+                </p>
               </div>
             </div>
-            <div className="text-pink-500 font-medium">Grade 3</div>
           </div>
         </Card>
       </section>
-      {showAddTaskModal && <ShowAddTaskModal />}
+
+      {showAddTaskModal && (
+        <ShowAddTaskModal closeModal={() => setShowAddModal(false)} />
+      )}
     </div>
   );
 }
 
-const ShowAddTaskModal = () => {
-  const [expandedDay, setExpandedDay] = useState<string | null>(null);
-  const [customTasks, setCustomTasks] = useState<Record<string, string[]>>({
-    Monday: [],
-    Tuesday: [],
-    Wednesday: [],
-    Thursday: [],
-    Friday: [],
-    Saturday: [],
-  });
-  const [newTask, setNewTask] = useState<string>("");
+interface ShowAddTaskModalProps {
+  closeModal: () => void;
+}
 
-  // Predefined task suggestions for each day
-  const predefinedTasks: Record<string, string[]> = {
-    Monday: ["Weekly planning", "Team meeting", "Check emails"],
-    Tuesday: ["Project review", "Client calls", "Update documentation"],
-    Wednesday: ["Mid-week check-in", "Progress report", "Team lunch"],
-    Thursday: ["Quality assurance", "Prepare for demo", "Update stakeholders"],
-    Friday: ["Weekly review", "Plan next week", "Team feedback"],
-    Saturday: ["Personal projects", "Learning time", "Relaxation"],
-  };
+const ShowAddTaskModal = ({ closeModal }: { closeModal: () => void }) => {
+  const [expandedDay, setExpandedDay] = useState<string | null>(null);
+  const [tasks, setTasks] = useState<Record<string, string>>({
+    Monday: "",
+    Tuesday: "",
+    Wednesday: "",
+    Thursday: "",
+    Friday: "",
+    Saturday: "",
+  });
+  const [submitting, setSubmitting] = useState(false);
 
   const days = [
     { name: "Monday", color: "bg-[#f8c4c4]" },
@@ -252,27 +239,68 @@ const ShowAddTaskModal = () => {
   ];
 
   const toggleDay = (day: string) => {
-    if (expandedDay === day) {
-      setExpandedDay(null);
-    } else {
-      setExpandedDay(day);
-    }
+    setExpandedDay(expandedDay === day ? null : day);
   };
 
-  const addCustomTask = (day: string) => {
-    if (newTask.trim() !== "") {
-      setCustomTasks({
-        ...customTasks,
-        [day]: [...customTasks[day], newTask.trim()],
+  const handleTaskChange = (day: string, value: string) => {
+    setTasks({ ...tasks, [day]: value });
+  };
+
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    try {
+      // Get latest week info (to get weekId)
+      const res = await fetch("/api/week/getWeek", { method: "POST" });
+      const data = await res.json();
+
+      const weekId = data.data.week._id;
+      console.log("weeki", weekId);
+
+      const tasksToSend = Object.entries(tasks)
+        .filter(([_, value]) => value.trim() !== "")
+        .map(([day, value]) => ({
+          weekId,
+          task: value,
+          difficulty: "Easy", // default or use custom input
+          status: "Incomplete",
+          endDay: day,
+        }));
+
+      const createRes = await fetch("/api/task/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tasks: tasksToSend }),
       });
-      setNewTask("");
+
+      const result = await createRes.json();
+
+      if (result.success) {
+        alert("Tasks created successfully!");
+        closeModal(); // Close modal
+        location.reload(); // Optionally reload to fetch updated task list
+      } else {
+        alert("Something went wrong while creating tasks.");
+      }
+    } catch (err) {
+      console.error("Task creation failed", err);
+      alert("Error creating tasks");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50 text-white ">
-      <div className="bg-[#FFEED0] mx-2 px-6 py-6 rounded-[1rem] space-y-4 text-center text-black w-[90%]">
-        <h2 className="text-xl font-semibold ">Assign tasks for this week</h2>
+    <div className="fixed inset-0 bg-black/80 flex justify-center items-center z-50 text-white">
+      <div className="bg-[#FFEED0] mx-2 px-6 py-6 rounded-[1rem] space-y-4 text-center text-black w-[90%] max-w-xl relative">
+        <button
+          className="absolute right-4 top-4 text-black hover:text-red-500"
+          onClick={closeModal}
+        >
+          <X />
+        </button>
+
+        <h2 className="text-xl font-semibold">Assign a task for each day</h2>
+
         <div className="space-y-4">
           {days.map((day) => (
             <div key={day.name} className="rounded-xl overflow-hidden">
@@ -283,57 +311,29 @@ const ShowAddTaskModal = () => {
                 <span className="text-xl font-medium">{day.name}</span>
                 <ChevronDown className="h-6 w-6 text-white" />
               </button>
+
               {expandedDay === day.name && (
                 <div className="p-4 bg-white/50 border border-t-0 border-gray-200">
-                  <div className="mb-4">
-                    <h3 className="font-medium mb-2">Suggested Tasks:</h3>
-                    <ul className="space-y-2">
-                      {predefinedTasks[day.name].map((task, index) => (
-                        <li key={index} className="flex items-center gap-2">
-                          <div className="w-4 h-4 border border-gray-400 rounded-sm"></div>
-                          <span>{task}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {customTasks[day.name].length > 0 && (
-                    <div className="mb-4">
-                      <h3 className="font-medium mb-2">Your Tasks:</h3>
-                      <ul className="space-y-2">
-                        {customTasks[day.name].map((task, index) => (
-                          <li key={index} className="flex items-center gap-2">
-                            <div className="w-4 h-4 border border-gray-400 rounded-sm"></div>
-                            <span>{task}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  <div className="mt-4">
-                    <h3 className="font-medium mb-2">Add Personal Task:</h3>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={newTask}
-                        onChange={(e) => setNewTask(e.target.value)}
-                        placeholder="Enter your task"
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2a5d3c]"
-                      />
-                      <button
-                        onClick={() => addCustomTask(day.name)}
-                        className="p-2 bg-[#2a5d3c] text-white rounded-lg hover:bg-opacity-90"
-                      >
-                        <Plus className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </div>
+                  <textarea
+                    value={tasks[day.name]}
+                    onChange={(e) => handleTaskChange(day.name, e.target.value)}
+                    rows={3}
+                    placeholder={`Enter a task for ${day.name}`}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2a5d3c] resize-none"
+                  />
                 </div>
               )}
             </div>
           ))}
         </div>
+
+        <Button
+          disabled={submitting}
+          onClick={handleSubmit}
+          className="w-full bg-[#2a5d3c] hover:bg-[#1f4930] text-white"
+        >
+          {submitting ? "Creating..." : "Create Tasks"}
+        </Button>
       </div>
     </div>
   );

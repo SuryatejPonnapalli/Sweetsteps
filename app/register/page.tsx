@@ -12,7 +12,7 @@ const registerSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Enter a valid email"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  timeSpend: z.enum(["Morning", "Afternoon", "Night"]),
+  timeSpend: z.enum(["morning", "afternoon", "night"]),
 });
 
 export default function ParentRegisterForm() {
@@ -164,9 +164,9 @@ export default function ParentRegisterForm() {
               required
             >
               <option value="">Select Time</option>
-              <option value="Morning">Morning</option>
-              <option value="Afternoon">Afternoon</option>
-              <option value="Night">Night</option>
+              <option value="morning">Morning</option>
+              <option value="afternoon">Afternoon</option>
+              <option value="night">Night</option>
             </select>
             {fieldErrors.timeSpend && (
               <p className="text-red-500 text-sm">{fieldErrors.timeSpend}</p>

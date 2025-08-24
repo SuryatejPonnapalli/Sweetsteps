@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
-
+//week model link
 export interface IWeek extends Document {
   parentId: mongoose.Types.ObjectId;
   weekNo: number;
